@@ -1,0 +1,2 @@
+# IndicatorTask
+Cryptocurrency selection IndicatorTask 
