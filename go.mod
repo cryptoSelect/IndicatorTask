@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/0xA2618/logjson v1.0.0
-	github.com/cryptoSelect/public v1.0.1
+	github.com/cryptoSelect/public v1.0.3
 	github.com/ethereum/go-ethereum v1.16.8
 	github.com/fsnotify/fsnotify v1.9.0
 )

@@ -102,7 +102,7 @@ func Start(ctx context.Context, cycle string) {
 
 		// 4. 量价异常 (背离、警惕、强势、恐慌、洗盘等)
 		vp := symbolInfo.VpSignal
-		if vp != "" && (contains(vp, "背离") || contains(vp, "警惕") || contains(vp, "强势") || contains(vp, "恐慌") || contains(vp, "洗盘") || contains(vp, "🔥")) {
+		if vp != "" && (contains(vp, "背离") || contains(vp, "强势") || contains(vp, "恐慌") || contains(vp, "洗盘") || contains(vp, "🔥")) {
 			shouldNotify = true
 		}
 
@@ -110,13 +110,9 @@ func Start(ctx context.Context, cycle string) {
 			Msg = alertMsgFmt(symbolInfo, cycle)
 		}
 
-		// 出现分型立即通知
-		if symbolInfo.Shape != 0 {
-			notify.SendTelegramMessage(cycle, Msg)
-		}
-
-		if Msg == "" {
-			continue
+		// 需要通知时入队，由 Worker 按订阅关系发送给对应用户
+		if Msg != "" {
+			notify.Push(symbol, cycle, Msg)
 		}
 	}
 

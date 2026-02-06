@@ -1,4 +1,4 @@
-package main
+package clean
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/cryptoSelect/public/database"
 )
 
-// cleanNaNData 清理 symbol_records 中的非法数据 (NaN/Infinity) 与不准确 RSI，防止接口报错
+// CleanNaNData 清理 symbol_records 中的非法数据 (NaN/Infinity) 与不准确 RSI，防止接口报错
 func CleanNaNData() {
 	cols := []string{"price", "volume", "taker_buy_volume", "taker_buy_ratio", "rsi", "rate", "change"}
 	for _, col := range cols {

@@ -1,7 +1,7 @@
 github.com/0xA2618/logjson v1.0.0 h1:/2PUX437ThNtrm/pv9+0NDM2P6/iYVfRLcqSrWyJXhY=
 github.com/0xA2618/logjson v1.0.0/go.mod h1:tTDfPkqDgSsDW247a6qaL0Mbd6kVUtDAA1YhbnWAhEc=
-github.com/cryptoSelect/public v1.0.1 h1:fJHXHNKu9ctJaI5xyzdOjS0VJMjR3KGuYLfMieIJdH0=
-github.com/cryptoSelect/public v1.0.1/go.mod h1:w909zGKnnejbPMRGCZ+IJpKi7XbV6ZHBAc8rszCLiKI=
+github.com/cryptoSelect/public v1.0.3 h1:7aO4SUZNMpsI26rl2WDSxwVmAheec1SezV+zeJ65UZM=
+github.com/cryptoSelect/public v1.0.3/go.mod h1:w909zGKnnejbPMRGCZ+IJpKi7XbV6ZHBAc8rszCLiKI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -3,10 +3,11 @@ package main
 import (
 	"IndicatorTask/binanceFapi"
 	"IndicatorTask/calculate"
+	"IndicatorTask/clean"
 	"IndicatorTask/config"
 	"IndicatorTask/utils/logger"
+	"IndicatorTask/utils/notify"
 	"context"
-	"fmt"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -27,10 +28,10 @@ func main() {
 	logger.Init(config.Cfg.Mode)
 	db := config.Cfg.Database
 	database.InitDB(db.Host, db.User, db.Password, db.DBName, db.Port)
-	if err := database.AutoMigrate(&models.SymbolRecord{}); err != nil {
+	if err := database.AutoMigrate(&models.SymbolRecord{}, &models.UserInfo{}, &models.Subscription{}); err != nil {
 		panic("failed to migrate database: " + err.Error())
 	}
-	CleanNaNData()
+	clean.CleanNaNData()
 
 	ctx, cancle := context.WithCancel(context.Background())
 	defer cancle()
@@ -55,6 +56,9 @@ func main() {
 	// 获取所有交易对
 	binanceFapi.GetSymbols()
 
+	// 启动通知 Worker：消费队列，按订阅关系向用户发送 Telegram 消息
+	go notify.StartWorker(ctx)
+
 	// 启动费率周期更新 (独立于K线计算周期)
 	go binanceFapi.GetRateCycle(ctx)
 
@@ -63,17 +67,4 @@ func main() {
 		go calculate.MacdTicker(ctx, c.Cycle)
 	}
 	<-ctx.Done()
-}
-
-// cleanNaNData 清理 symbol_records 中的非法数据 (NaN/Infinity) 与不准确 RSI，防止接口报错
-func cleanNaNData() {
-	cols := []string{"price", "volume", "taker_buy_volume", "taker_buy_ratio", "rsi", "rate", "change"}
-	for _, col := range cols {
-		sql := fmt.Sprintf("UPDATE symbol_records SET %s = 0 WHERE %s != %s OR %s::text = 'Infinity' OR %s::text = '-Infinity'", col, col, col, col, col)
-		if err := database.DB.Exec(sql).Error; err != nil {
-			fmt.Printf("Warning: Failed to clean NaN in %s: %v\n", col, err)
-		}
-	}
-	database.DB.Exec("UPDATE symbol_records SET rsi = 50 WHERE rsi >= 99.99")
-	fmt.Println("Database integrity check completed: NaN and inaccurate RSI records cleaned.")
 }
