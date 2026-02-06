@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.25.4-alpine AS builder
+FROM docker.mirrors.aliyun.com/library/golang:1.25.4-alpine AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o IndicatorTask main/main.go
 
 # Run stage
-FROM alpine:3.19
+FROM docker.mirrors.aliyun.com/library/alpine:3.19
 
 WORKDIR /app
 
