@@ -91,7 +91,7 @@ func Start(ctx context.Context, cycle string) {
 		// 2. 缠论分型
 		if shape != 0 {
 			symbolInfo.Shape = shape
-			// logger.Log.Info("缠论分型", map[string]interface{}{"symbol": symbolInfo.Symbol, "cycle": cycle, "shape": shape})
+			logger.Log.Info("缠论分型", map[string]interface{}{"symbol": symbolInfo.Symbol, "cycle": cycle, "shape": shape, "rsi": rsiValue})
 			shouldNotify = true
 		}
 
