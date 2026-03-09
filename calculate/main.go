@@ -8,6 +8,9 @@ import (
 
 	"context"
 	"time"
+
+	"github.com/cryptoSelect/public/database"
+	"github.com/cryptoSelect/public/models"
 )
 
 // 进行macd
@@ -80,6 +83,9 @@ func Start(ctx context.Context, cycle string) {
 		// 量价分析
 		symbolInfo.VpSignal = detectVolumePrice(klines, takerBuyRatio)
 
+		// 将分析结果入库
+		saveSymbolRecord(symbolInfo, cycle, klines, klineIndex)
+
 		// 判定是否属于“异常”情况（满足任意一个则发通知）
 		shouldNotify := false
 
@@ -116,6 +122,55 @@ func Start(ctx context.Context, cycle string) {
 		}
 	}
 
+}
+
+// 将分析结果入库及更新
+func saveSymbolRecord(symbolInfo *binanceFapi.SymbolInfo, cycle string, klines []binanceFapi.KLine, klineIndex int) {
+	updates := map[string]interface{}{
+		"price":             symbolInfo.Price,
+		"volume":            symbolInfo.Volume,
+		"taker_buy_volume":  symbolInfo.TakerBuyVolume,
+		"taker_buy_ratio":   symbolInfo.TakerBuyRatio,
+		"rsi":               symbolInfo.Rsi,
+		"rate":              symbolInfo.Rate,
+		"rate_cycle":        symbolInfo.RateCycle,
+		"cross_type":        symbolInfo.CrossType,
+		"shape":             symbolInfo.Shape,
+		"vp_signal":         symbolInfo.VpSignal,
+		"change":            symbolInfo.Change,
+		"next_funding_time": symbolInfo.NextFundingTime,
+	}
+	if klineIndex != 0 {
+		updates["cross_time"] = time.Unix(klines[klineIndex].CloseTime/1000, 0)
+	}
+
+	result := database.DB.Model(&models.SymbolRecord{}).
+		Where("symbol = ? AND cycle = ?", symbolInfo.Symbol, cycle).
+		Updates(updates)
+	if result.Error != nil || result.RowsAffected != 0 {
+		return
+	}
+
+	rec := models.SymbolRecord{
+		Symbol:          symbolInfo.Symbol,
+		Cycle:           cycle,
+		Price:           symbolInfo.Price,
+		Volume:          symbolInfo.Volume,
+		TakerBuyVolume:  symbolInfo.TakerBuyVolume,
+		TakerBuyRatio:   symbolInfo.TakerBuyRatio,
+		Rsi:             symbolInfo.Rsi,
+		Rate:            symbolInfo.Rate,
+		RateCycle:       symbolInfo.RateCycle,
+		CrossType:       symbolInfo.CrossType,
+		Shape:           symbolInfo.Shape,
+		VpSignal:        symbolInfo.VpSignal,
+		Change:          symbolInfo.Change,
+		NextFundingTime: symbolInfo.NextFundingTime,
+	}
+	if klineIndex != 0 {
+		rec.CrossTime = time.Unix(klines[klineIndex].CloseTime/1000, 0)
+	}
+	_ = database.DB.Create(&rec).Error
 }
 
 // ticker
