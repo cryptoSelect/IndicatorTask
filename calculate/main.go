@@ -20,6 +20,9 @@ func Start(ctx context.Context, cycle string) {
 	if delay > 0 {
 		time.Sleep(time.Duration(delay) * time.Minute)
 	}
+	if len(binanceFapi.SymbolList) == 0 {
+		binanceFapi.GetSymbols()
+	}
 
 	for _, symbolInfo := range binanceFapi.SymbolList {
 		// 重置信号状态，确保每个周期和每一轮都是独立计算
